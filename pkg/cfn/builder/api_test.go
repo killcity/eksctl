@@ -1426,6 +1426,7 @@ var _ = Describe("CloudFormation template builder API", func() {
 			Expect(strings.Split(kubeletEnv.Content, "\n")).To(Equal([]string{
 				"NODE_LABELS=",
 				"NODE_TAINTS=",
+				"MAX_PODS=55",
 			}))
 
 			kubeletDropInUnit := getFile(cc, "/etc/systemd/system/kubelet.service.d/10-eksclt.al2.conf")
@@ -1443,7 +1444,6 @@ var _ = Describe("CloudFormation template builder API", func() {
 
 			kubeletConfigAssetContentString := string(kubeletConfigAssetContent) +
 				"\n" +
-				"maxPods: 29\n" +
 				"clusterDNS: [10.100.0.10]\n"
 
 			kubeletConfig := getFile(cc, "/etc/eksctl/kubelet.yaml")
@@ -1459,12 +1459,14 @@ var _ = Describe("CloudFormation template builder API", func() {
 
 			checkScript(cc, "/var/lib/cloud/scripts/per-instance/bootstrap.al2.sh", true)
 		})
+
 	})
 
 	Context("UserData - AmazonLinux2 (custom pre-bootstrap)", func() {
 		cfg, ng := newClusterConfigAndNodegroup(true)
 
 		ng.InstanceType = "m5.xlarge"
+		ng.MaxPodsPerNode = 55
 
 		ng.PreBootstrapCommands = []string{
 			"touch /tmp/test",
@@ -1670,7 +1672,6 @@ var _ = Describe("CloudFormation template builder API", func() {
 			Expect(strings.Split(kubeletEnv.Content, "\n")).To(Equal([]string{
 				"NODE_LABELS=",
 				"NODE_TAINTS=",
-				"MAX_PODS=29",
 				"CLUSTER_DNS=172.20.0.10",
 			}))
 
@@ -1720,7 +1721,6 @@ var _ = Describe("CloudFormation template builder API", func() {
 			Expect(strings.Split(kubeletEnv.Content, "\n")).To(Equal([]string{
 				"NODE_LABELS=",
 				"NODE_TAINTS=",
-				"MAX_PODS=29",
 				"CLUSTER_DNS=172.20.0.10",
 			}))
 
@@ -1751,6 +1751,7 @@ var _ = Describe("CloudFormation template builder API", func() {
 		cfg.VPC.CIDR, _ = ipnet.ParseCIDR("10.1.0.0/16")
 		ng.AMIFamily = "Ubuntu1804"
 		ng.InstanceType = "m5.large"
+		ng.MaxPodsPerNode = 66
 
 		ng.Labels = map[string]string{
 			"os": "ubuntu",
@@ -1784,7 +1785,7 @@ var _ = Describe("CloudFormation template builder API", func() {
 			Expect(strings.Split(kubeletEnv.Content, "\n")).To(Equal([]string{
 				"NODE_LABELS=os=ubuntu",
 				"NODE_TAINTS=key1=value1:NoSchedule",
-				"MAX_PODS=29",
+				"MAX_PODS=66",
 				"CLUSTER_DNS=169.254.20.10",
 			}))
 
@@ -1846,7 +1847,6 @@ var _ = Describe("CloudFormation template builder API", func() {
 			Expect(strings.Split(kubeletEnv.Content, "\n")).To(Equal([]string{
 				"NODE_LABELS=os=ubuntu",
 				"NODE_TAINTS=",
-				"MAX_PODS=29",
 				"CLUSTER_DNS=169.254.20.10",
 			}))
 
