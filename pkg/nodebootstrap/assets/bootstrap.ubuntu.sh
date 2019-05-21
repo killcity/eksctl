@@ -2,14 +2,14 @@
 
 function get_max_pods() {
   MAX_PODS_FILE="/etc/eksctl/max_pods_map.txt"
-  grep "${INSTANCE_TYPE}" "${MAX_PODS_FILE}" | while read instance_type pods; do
+  while read instance_type pods; do
 
-    if  [[ "${pods}" =~ ^[0-9]+$ ]] ; then
+    if  [[ "${instance_type}" == "${1}" ]] && [[ "${pods}" =~ ^[0-9]+$ ]] ; then
       echo ${pods};
       return
     fi ;
 
-    done
+    done < "${MAX_PODS_FILE}"
 }
 
 
@@ -32,7 +32,7 @@ systemctl reset-failed
   source /etc/eksctl/kubelet.env
   source /etc/eksctl/metadata.env
 
-  MAX_PODS=${MAX_PODS:-$(get_max_pods)}
+  MAX_PODS=${MAX_PODS:-$(get_max_pods ${INSTANCE_TYPE})}
   set -o nounset
 
   flags=(
