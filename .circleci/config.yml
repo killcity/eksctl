@@ -10,18 +10,15 @@ workflows:
   version: 2
   any-commit:
     jobs:
-      - make-eksctl-image:
-          filters:
-            tags:
-              ignore: /.*/
-  release:
-    jobs:
-      - make-eksctl-image:
+      - make-release:
+          requires: [make-eksctl-image]
           filters:
             branches:
               ignore: /.*/
             tags:
               ignore: /^latest_release$/
+  release:
+    jobs:
       - make-release:
           requires: [make-eksctl-image]
           filters:
