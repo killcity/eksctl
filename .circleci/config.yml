@@ -1,5 +1,11 @@
 version: 2
 jobs:
+  make-eksctl-image:
+    # use machine build, as otherwise we cannot use make and have to duplicate makefile
+    machine: true
+    steps:
+      - checkout
+      - run: make eksctl-image
   make-release:
     machine: true
     steps:
@@ -10,15 +16,18 @@ workflows:
   version: 2
   any-commit:
     jobs:
-      - make-release:
-          requires: [make-eksctl-image]
+      - make-eksctl-image:
+          filters:
+            tags:
+              ignore: /.*/
+  release:
+    jobs:
+      - make-eksctl-image:
           filters:
             branches:
               ignore: /.*/
             tags:
               ignore: /^latest_release$/
-  release:
-    jobs:
       - make-release:
           requires: [make-eksctl-image]
           filters:
