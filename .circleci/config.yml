@@ -1,19 +1,5 @@
 version: 2
 jobs:
-  make-eksctl-image:
-    # use machine build, as otherwise we cannot use make and have to duplicate makefile
-    machine: true
-    steps:
-      - checkout
-      - run: mkdir -p ./test-results/ginkgo
-      - run:
-            command: make eksctl-image
-            environment:
-                TEST_OUTPUT: "true"
-      - store_test_results:
-          path: ./test-results
-      - store_artifacts:
-          path: ./test-results
   make-release:
     machine: true
     steps:
